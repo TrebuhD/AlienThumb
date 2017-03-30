@@ -22,7 +22,7 @@ function getHotPosts(subName, CONFIG) {
     password: CONFIG.reddit.password
   });
 
-  return r.getSubreddit(subName).getHot().map(submission => submission.title);
+  return r.getSubreddit(subName).getHot();
 }
 
 module.exports = router;

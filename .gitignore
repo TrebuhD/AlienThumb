@@ -57,3 +57,4 @@ typings/
 # dotenv environment variables file
 .env
 .idea/watcherTasks.xml
+.vscode/launch.json

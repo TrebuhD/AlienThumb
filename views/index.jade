@@ -3,6 +3,6 @@ extends layout
 block content
   h1= title
   p Here are the top posts on /r/#{subredditName}:
-  each kw in submissions
-    li= kw
+  each submission in submissions
+    li= submission.title + ', score: ' + submission.score
     br
