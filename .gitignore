@@ -58,3 +58,6 @@ typings/
 .env
 .idea/watcherTasks.xml
 .vscode/launch.json
+
+# sample responses
+responses/
