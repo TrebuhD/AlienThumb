@@ -1,0 +1,13 @@
+var config = {};
+
+config.reddit = {};
+config.fb = {};
+
+config.reddit.id = "<reddit_app_id>";
+config.reddit.secret = "<app_secret>";
+config.reddit.password = "<reddit_account_pass>";
+
+config.fb.id = "<fb_app_id>";
+config.fb.secret = "<fb_app_secret>";
+
+module.exports = config;
