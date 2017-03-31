@@ -63,5 +63,4 @@ responses/
 # config file (contains secrets)
 config.js
 
-.vscode/
 bfg.jar

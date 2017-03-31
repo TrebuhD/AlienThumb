@@ -1,9 +1,9 @@
-const snoowrap = require('snoowrap');
+let snoowrap = require('snoowrap');
 
 module.exports = {
     getHotPosts: function(CONFIG) {
-        const r = new snoowrap({
-            userAgent: 'AlienThumb:v0.0.1 (by /u/trebuszek)',
+        let r = new snoowrap({
+            userAgent: 'AlienThumb:v0.0.2 (by /u/trebuszek)',
             clientId: CONFIG.reddit.id,
             clientSecret: CONFIG.reddit.secret,
             username: 'AlienThumb',
@@ -14,4 +14,4 @@ module.exports = {
             return (obj.score > CONFIG.reddit.scoreThreshold);
         });
     }
-}
+};
