@@ -10,17 +10,21 @@ router.get('/', function(req, res, next) {
   require('../submissionPollster').getHotPosts(config).then(
     function (result) {
         result.forEach(function(item, index, array) {
-            db.addToCollection(config.mongodb.collectionName, {
-                _id: item.id,
-                title: item.title,
-                domain: item.domain,
-                url: item.url,
-                selftext: item.selftext,
-                is_nsfw: item.over_18,
-                name: item.name,
-                score: item.score
-            });
-        })
+            let isPresentAlready = db.existsInCollection(config.mongodb.collectionName, item);
+            if (!isPresentAlready) {
+                // todo: Add to posting queue
+                db.addToCollection(config.mongodb.collectionName, {
+                    _id: item.id,
+                    title: item.title,
+                    domain: item.domain,
+                    url: item.url,
+                    selftext: item.selftext,
+                    is_nsfw: item.over_18,
+                    name: item.name,
+                    score: item.score
+                });
+            }
+        });
       res.render('index', { title: 'AlienThumb' , subredditName: config.reddit.subName, submissions: result});
     }
   );
