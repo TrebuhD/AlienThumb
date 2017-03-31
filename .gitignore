@@ -1,5 +1,4 @@
-.idea/vcs.xml
-.idea/workspace.xml
+.idea/
 
 # Logs
 logs
@@ -56,11 +55,12 @@ typings/
 
 # dotenv environment variables file
 .env
-.idea/watcherTasks.xml
-.vscode/launch.json
 
 # sample responses
 responses/
 
 # config file (contains secrets)
 config.js
+
+.vscode/
+bfg.jar
