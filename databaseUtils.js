@@ -21,11 +21,11 @@ DatabaseUtils.prototype = {
             assert.notEqual(objToFind, null);
             let isFound = db.collection(collectionName).find({_id: objToFind.id}).limit(1).count();
             isFound.then(function (count) {
-                console.log(count > 0);
+                console.log(`Count object: ${count}, is > 0? ${count > 0}`);
                 db.close();
                 return (count > 0);
             }).catch(function(err) {
-                console.log("Promise Rejected");
+                console.log("Promise Rejected" + err);
                 db.close();
             });
             if (err) { return console.dir(err); }

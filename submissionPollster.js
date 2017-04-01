@@ -10,6 +10,7 @@ module.exports = {
             password: CONFIG.reddit.password
         });
 
+        // Get hot submissions and filter out those with score lower than threshold
         return r.getSubreddit(CONFIG.reddit.subName).getHot().filter(function(obj) {
             return (obj.score > CONFIG.reddit.scoreThreshold);
         });
