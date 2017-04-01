@@ -1,32 +1,31 @@
 const MongoClient = require('mongodb').MongoClient;
 assert = require('assert');
 
-let DatabaseUtils = function(CONFIG) {
-    this.config = CONFIG;
+let DatabaseUtils = function() {
 };
 
 DatabaseUtils.prototype = {
-    addToCollection: function (collectionName, objToAdd) {
-        MongoClient.connect(this.config.mongodb.url, function(err, db) {
+    addToCollection: function (config, objToAdd) {
+        MongoClient.connect(config.mongodb.url, function(err, db) {
             assert.equal(null, err);
             assert.notEqual(objToAdd, null);
-            db.collection(collectionName).updateOne(objToAdd, objToAdd, {upsert: true});
+            db.collection(config.mongodb.collectionName).updateOne(objToAdd, objToAdd, {upsert: true});
             db.close();
             if (err) { return console.dir(err); }
       })
     },
-    existsInCollection: function(collectionName, objToFind) {
-        MongoClient.connect(this.config.mongodb.url, function(err, db) {
+    addItemIfNotFound: function(config, item, callback) {
+        MongoClient.connect(config.mongodb.url, function(err, db) {
             assert.equal(null, err);
-            assert.notEqual(objToFind, null);
-            let isFound = db.collection(collectionName).find({_id: objToFind.id}).limit(1).count();
-            isFound.then(function (count) {
-                console.log(`Count object: ${count}, is > 0? ${count > 0}`);
-                db.close();
-                return (count > 0);
-            }).catch(function(err) {
-                console.log("Promise Rejected" + err);
-                db.close();
+            assert.notEqual(item, null);
+            db.collection(config.mongodb.collectionName).find({_id: item._id}).limit(1).count()
+                .then(function (count) {
+                    if (count === 0) {
+                        callback();
+                    }
+                }).catch(function(err) {
+                    console.log("Promise Rejected: " + err);
+                    db.close();
             });
             if (err) { return console.dir(err); }
       });
