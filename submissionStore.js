@@ -11,14 +11,14 @@ let SubmissionStore = function(mongoUtil) {
 };
 
 SubmissionStore.prototype = {
-    addToCollection: function (objToAdd) {
+    addToColdStore: function (objToAdd) {
         assert.notEqual(null, objToAdd);
         this._mongoUtil.getDb().collection(config.mongodb.coldStoreName)
             .updateOne(objToAdd, objToAdd, {upsert: true}, function (err) {
                 if (err) { return console.dir(err) }
             });
     },
-    addItemIfNotFound: function(item, callback) {
+    ifSubmissionNew: function(item, callback) {
         assert.notEqual(null, item);
         this._mongoUtil.getDb().collection(config.mongodb.coldStoreName)
             .find({_id: item._id}).limit(1).count()

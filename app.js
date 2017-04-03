@@ -14,13 +14,6 @@ const index = require('./routes/index');
 let submissionStore = new SubmissionStore(mongoUtil, config);
 let submissionPollster = require('./submissionPollster');
 
-function cleanupOnClose() {
-    console.log("Closing db connection");
-    mongoUtil.closeConnection();
-}
-
-let cleanup = require('./cleanup').Cleanup(cleanupOnClose);
-
 let app = express();
 
 mongoUtil.connectToServer(function(err) {
@@ -54,29 +47,19 @@ mongoUtil.connectToServer(function(err) {
         console.log("Listening on port 3000, boss!")
     });
 
-    // Main functionality
-    app.use('/', function () {
-        console.log("Inside main function");
-        submissionPollster.getHotPosts(config).then(
-            function (result) {
-                result.forEach(function(item) {
-                    let strippedItem = new Submission (
-                        item.id, item.title, item.domain, item.url,
-                        item.selftext, item.is_nsfw, item.name, item.score
-                    );
-                    submissionStore.addItemIfNotFound(strippedItem, function() {
-                        submissionStore.addToCollection(strippedItem);
-                        mongoUtil.queuePush(strippedItem);
-                    });
-                });
-                // print new item from queue every 5 seconds
-                setInterval(async function () {
-                    let item = mongoUtil.queuePop();
-                    console.dir(item);
-                }, 5000);
+    // Get new submissions from reddit and save them to mongo
+    app.get('/', updateFromReddit );
 
-            }
-        );
+    // Render route to browser
+    app.get('/', index);
+
+    // print new item from queue every 5 seconds
+    app.get('/pop', function () {
+        console.log("popping the post queue");
+        setInterval(async function () {
+            let item = mongoUtil.queuePop();
+            console.dir(item);
+        }, 5000);
     });
 
     // catch 404 and forward to error handler
@@ -98,5 +81,34 @@ mongoUtil.connectToServer(function(err) {
     });
 
 });
+
+let updateFromReddit = function (req, res, next) {
+    console.log("Getting new posts");
+    submissionPollster.getHotPosts(config).then(
+        function (result) {
+            // save the result to use in routes
+            app.set('hotPosts', result);
+            result.forEach(function(item) {
+                let strippedItem = new Submission (
+                    item.id, item.title, item.domain, item.url,
+                    item.selftext, item.is_nsfw, item.name, item.score
+                );
+                // store new submissions in cold storage and post queue.
+                submissionStore.ifSubmissionNew(strippedItem, function() {
+                    submissionStore.addToColdStore(strippedItem);
+                    mongoUtil.queuePush(strippedItem);
+                });
+            });
+            next();
+        }
+    );
+};
+
+require('./cleanup').Cleanup(cleanupOnClose);
+
+function cleanupOnClose() {
+    console.log("Closing db connection");
+    mongoUtil.closeConnection();
+}
 
 module.exports = app;
