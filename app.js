@@ -170,11 +170,6 @@ let updateFromReddit = function (req, res, next) {
     );
 };
 
-function randomFromInterval(min,max)
-{
-    return Math.random()*(max-min+1)+min;
-}
-
 require('./cleanup').Cleanup(cleanupOnClose);
 
 function cleanupOnClose() {
