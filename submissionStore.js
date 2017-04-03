@@ -5,22 +5,23 @@
 
 const assert = require('assert');
 const config = require('./config');
+const mongoUtil = require('./mongoUtil');
 
-let SubmissionStore = function(mongoUtil) {
-    this._mongoUtil = mongoUtil;
+let SubmissionStore = function() {
+    db = mongoUtil.getDb();
 };
 
 SubmissionStore.prototype = {
     addToColdStore: function (objToAdd) {
         assert.notEqual(null, objToAdd);
-        this._mongoUtil.getDb().collection(config.mongodb.coldStoreName)
+        db.collection(config.mongodb.coldStoreName)
             .updateOne(objToAdd, objToAdd, {upsert: true}, function (err) {
                 if (err) { return console.dir(err) }
             });
     },
     ifSubmissionNew: function(item, callback) {
         assert.notEqual(null, item);
-        this._mongoUtil.getDb().collection(config.mongodb.coldStoreName)
+        db.collection(config.mongodb.coldStoreName)
             .find({_id: item._id}).limit(1).count()
             .then(function (count) {
                 if (count === 0) {

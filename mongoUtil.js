@@ -9,7 +9,6 @@ let _db;
 let _submissionQueue;
 
 module.exports = {
-
     connectToServer: async function ( callback ) {
         MongoClient.connect(config.mongodb.url, async function (err, db) {
             _db = db;

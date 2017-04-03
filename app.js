@@ -11,14 +11,16 @@ const config = require('./config');
 
 const index = require('./routes/index');
 
-let submissionStore = new SubmissionStore(mongoUtil, config);
 let submissionPollster = require('./submissionPollster');
+let submissionStore;
 
 let app = express();
 
 mongoUtil.connectToServer(function(err) {
     if (err) { console.error(err); }
     console.log("connected to mongodb");
+
+    submissionStore = new SubmissionStore();
 
     // make config available in routes
     app.locals.config = require('./config');
