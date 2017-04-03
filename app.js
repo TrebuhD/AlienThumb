@@ -82,8 +82,8 @@ mongoUtil.connectToServer(function(err) {
                 "client_secret": config.fb.app_secret,
                 "code": req.query.code
             }, function (err, facebookRes) {
-                console.log('redirecting');
                 if (err) { console.dir(err); }
+                console.log('redirecting');
                 graph.setAccessToken(config.fb.long_lived_token_page);
                 res.redirect('/UserHasLoggedIn');
             });
@@ -94,7 +94,7 @@ mongoUtil.connectToServer(function(err) {
     app.get('/UserHasLoggedIn', updateFromReddit );
 
     // Render route to browser and then start getting items from queue
-    app.get('/UserHasLoggedIn', startQueueStream);
+    app.get('/UserHasLoggedIn', startMainLoop);
 
     // catch 404 and forward to error handler
     app.use(function(req, res, next) {
@@ -116,12 +116,12 @@ mongoUtil.connectToServer(function(err) {
 
 });
 
-let startQueueStream = function () {
+let startMainLoop = function () {
     // run every hour
     let everyHour = 60 * 60 * 1000;
-    let everyMinute = 60 * 1000;
-    // setInterval(shareQueueItem, everyMinute);
-    postToFb();
+    let everyMinute = 60 * 1000 / 2;
+    setInterval(shareQueueItem, everyMinute);
+    setInterval(updateFromReddit, everyHour);
 };
 
 let shareQueueItem = async function () {
@@ -130,19 +130,21 @@ let shareQueueItem = async function () {
         await submissionStore.queueAck(item.ack);
         console.log(`Sharing submission title: ${item.payload.title}: `);
         console.dir(item.payload);
+        postToFb(item.payload);
         submissionStore.queueClean();
     }
 };
 
-let postToFb = function () {
-    let examplePost = {
-        message: "It finally worked. You can rest for a while now.",
-        client_id: config.fb.app_id
+let postToFb = function (item) {
+    if (item.selftext || item.is_nsfw) {
+        return null;
+    }
+    let fbPost = {
+        message: item.title,
+        link: item.url
      };
 
-    console.dir(graph.get('/me/accounts'));
-
-    graph.post(`/${config.fb.pageId}/feed`, examplePost, function (err, res) {
+    graph.post(`/${config.fb.pageId}/feed`, fbPost, function (err, res) {
         if (err) { console.dir(err); }
     });
 };
