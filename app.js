@@ -91,10 +91,7 @@ let updateFromReddit = function (req, res, next) {
             // save the result to use in routes
             app.set('hotPosts', result);
             result.forEach(function(item) {
-                let strippedItem = new Submission (
-                    item.id, item.title, item.domain, item.url,
-                    item.selftext, item.is_nsfw, item.name, item.score
-                );
+                let strippedItem = new Submission (item);
                 // store new submissions in cold storage and post queue.
                 submissionStore.ifSubmissionNew(strippedItem, function() {
                     submissionStore.addToColdStore(strippedItem);

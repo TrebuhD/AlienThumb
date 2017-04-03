@@ -1,12 +1,12 @@
-function submission(id, title, domain, url, selftext, is_nsfw, name, score) {
-    this._id = id;
-    this.title = title;
-    this.domain = domain;
-    this.url = url;
-    this.selftext = selftext;
-    this.is_nsfw = is_nsfw;
-    this.name = name;
-    this.score = score;
+function submission(item) {
+    this._id = item.id;
+    this.title = item.title;
+    this.domain = item.domain;
+    this.url = item.url;
+    this.selftext = item.selftext;
+    this.is_nsfw = item.is_nsfw;
+    this.name = item.name;
+    this.score = item.score;
 }
 
 module.exports = submission;
