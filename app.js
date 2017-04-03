@@ -98,7 +98,7 @@ let updateFromReddit = function (req, res, next) {
                 // store new submissions in cold storage and post queue.
                 submissionStore.ifSubmissionNew(strippedItem, function() {
                     submissionStore.addToColdStore(strippedItem);
-                    mongoUtil.queuePush(strippedItem);
+                    submissionStore.queuePush(strippedItem);
                 });
             });
             next();

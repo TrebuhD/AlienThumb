@@ -35,21 +35,4 @@ module.exports = {
             if (err) { console.dir(err); }
         });
     },
-    queuePop: async function () {
-        _submissionQueue.get(function (err, msg) {
-            if (err) { console.dir(err); }
-            if (!msg) return null;
-            console.log (`msg.id: ${msg.id}`);
-            console.log (`msg.ack: ${msg.ack}`);
-            console.log (`msg.payload: ${msg.payload}`);
-            console.log (`msg.tries: ${msg.tries}`);
-            return msg;
-        });
-    },
-    queuePush: function (item) {
-        _submissionQueue.add(item, function (err, id) {
-            if (err) { return console.dir(err); }
-            console.log(`Adding obj id ${id} to submission-queue.`);
-        });
-    }
 };
