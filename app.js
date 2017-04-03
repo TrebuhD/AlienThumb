@@ -11,6 +11,7 @@ const config = require('./config');
 
 const index = require('./routes/index');
 
+let graph = require('fbgraph');
 let submissionPollster = require('./submissionPollster');
 let submissionStore;
 
@@ -49,11 +50,51 @@ mongoUtil.connectToServer(function(err) {
         console.log("Listening on port 3000, boss!")
     });
 
+    // Routes
+
+    app.get('/', function(req, res){
+        res.render("index", { title: "navigate to /auth to connect" });
+    });
+
+    app.get('/auth', function (req, res) {
+        // we have no code yet
+        if (!req.query.code) {
+            console.log("Performing oauth");
+
+            let authUrl = graph.getOauthUrl({
+                "client_id": config.fb.app_id,
+                "redirect_uri": config.fb.redirect_uri,
+                "scope": config.fb.scope
+            });
+
+            if (!req.query.error) {
+                res.redirect(authUrl);
+            } else {
+                res.send('access denied: ' + res.query.error);
+            }
+        }
+        // user is being redirected with code
+        else {
+            // send code and get access token
+            graph.authorize({
+                "client_id": config.fb.app_id,
+                "redirect_uri": config.fb.redirect_uri,
+                "client_secret": config.fb.app_secret,
+                "code": req.query.code
+            }, function (err, facebookRes) {
+                console.log('redirecting');
+                if (err) { console.dir(err); }
+                graph.setAccessToken(config.fb.long_lived_token_page);
+                res.redirect('/UserHasLoggedIn');
+            });
+        }
+    });
+
     // Get new submissions from reddit and save them to mongo
-    app.get('/', updateFromReddit );
+    app.get('/UserHasLoggedIn', updateFromReddit );
 
     // Render route to browser and then start getting items from queue
-    app.get('/', index, startQueueStream);
+    app.get('/UserHasLoggedIn', startQueueStream);
 
     // catch 404 and forward to error handler
     app.use(function(req, res, next) {
@@ -75,18 +116,35 @@ mongoUtil.connectToServer(function(err) {
 
 });
 
-// print new item from queue every 5 seconds
 let startQueueStream = function () {
-    console.log("popping the post queue");
-    setInterval(async function () {
-        let item = await submissionStore.queuePop();
-        if (item) {
-            await submissionStore.queueAck(item.ack);
-            submissionStore.queueClean();
-            console.log(`msg id: ${item.id}: `);
-            console.dir(item.payload);
-        }
-    }, 2000);
+    // run every hour
+    let everyHour = 60 * 60 * 1000;
+    let everyMinute = 60 * 1000;
+    // setInterval(shareQueueItem, everyMinute);
+    postToFb();
+};
+
+let shareQueueItem = async function () {
+    let item = await submissionStore.queuePop();
+    if (item) {
+        await submissionStore.queueAck(item.ack);
+        console.log(`Sharing submission title: ${item.payload.title}: `);
+        console.dir(item.payload);
+        submissionStore.queueClean();
+    }
+};
+
+let postToFb = function () {
+    let examplePost = {
+        message: "It finally worked. You can rest for a while now.",
+        client_id: config.fb.app_id
+     };
+
+    console.dir(graph.get('/me/accounts'));
+
+    graph.post(`/${config.fb.pageId}/feed`, examplePost, function (err, res) {
+        if (err) { console.dir(err); }
+    });
 };
 
 let updateFromReddit = function (req, res, next) {

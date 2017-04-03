@@ -10,10 +10,21 @@ config.reddit.password = "<reddit_account_pass>";
 config.reddit.subName = 'europe'
 config.reddit.scoreThreshold = 500;
 
-config.fb.id = "<fb_app_id>";
-config.fb.secret = "<fb_app_secret>";
+config.fb.pageAdminId = "";
+config.fb.userId = "";
+config.fb.pageId = "";
+config.fb.app_id = "";
+config.fb.app_secret = "";
+config.fb.scope = "manage_pages, publish_pages, pages_show_list";
+config.fb.redirect_uri = "http://localhost:3000/auth";
+config.fb.long_lived_token_user = "";
+config.fb.long_lived_token_page = "";
 
-config.mongodb.url = "<mongodb_url>";
-config.mongodb.collectionName = "sent_submissions";
+// Generate long-lived user & page access tokens:
+// http://stackoverflow.com/questions/17197970/facebook-permanent-page-access-token
+
+config.mongodb.url = "mongodb://<url>";
+config.mongodb.coldStoreName = "store-" + config.reddit.subName;
+config.mongodb.postQueueName = "queue-" + config.reddit.subName;
 
 module.exports = config;
