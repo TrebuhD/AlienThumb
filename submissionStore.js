@@ -38,16 +38,13 @@ SubmissionStore.prototype = {
             console.log(`Adding obj id ${id} to submission-queue.`);
         });
     },
-    queuePop: async function () {
-        mongoUtil.getQueue().get(function (err, msg) {
-            if (err) { console.dir(err); }
-            if (!msg) return null;
-            console.log (`msg.id: ${msg.id}`);
-            console.log (`msg.ack: ${msg.ack}`);
-            console.log (`msg.payload: ${msg.payload}`);
-            console.log (`msg.tries: ${msg.tries}`);
-            return msg;
-        });
+    queuePop: function () {
+        return new Promise(function (resolve, reject) {
+            mongoUtil.getQueue().get(function (err, msg) {
+                if (err) reject(err);
+                resolve(msg);
+            })
+        })
     },
 };
 

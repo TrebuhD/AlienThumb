@@ -79,8 +79,9 @@ mongoUtil.connectToServer(function(err) {
 let startQueueStream = function () {
     console.log("popping the post queue");
     setInterval(async function () {
-        let item = submissionStore.queuePop();
-        console.dir(item);
+        let item = await submissionStore.queuePop();
+        console.log(`msg id: ${item.id}: `);
+        console.dir(item.payload);
     }, 5000);
 };
 
@@ -91,11 +92,11 @@ let updateFromReddit = function (req, res, next) {
             // save the result to use in routes
             app.set('hotPosts', result);
             result.forEach(function(item) {
-                let strippedItem = new Submission (item);
+                let submission = new Submission (item);
                 // store new submissions in cold storage and post queue.
-                submissionStore.ifSubmissionNew(strippedItem, function() {
-                    submissionStore.addToColdStore(strippedItem);
-                    submissionStore.queuePush(strippedItem);
+                submissionStore.ifSubmissionNew(submission, function() {
+                    submissionStore.addToColdStore(submission);
+                    submissionStore.queuePush(submission);
                 });
             });
             next();
