@@ -115,11 +115,11 @@ mongoUtil.connectToServer(function(err) {
 });
 
 let startMainLoop = function () {
-    // run every hour
-    let everyHour = 60 * 60 * 1000;
-    let everyMinute = 60 * 1000 / 2;
-    setInterval(shareQueueItem, everyMinute / 2);
-    setInterval(getNewPosts, everyMinute);
+    let time = process.env.MINUTES_BETWEEN_POSTS * 60 * 1000;
+    // randomize the timing a bit by multiplying by a value between 0.5 and 1.5
+    let rTime = (0.5 * time) + Math.random() * time;
+    setInterval(getNewPosts, rTime);
+    setInterval(shareQueueItem, rTime);
 };
 
 let getNewPosts = function () {
@@ -169,6 +169,11 @@ let updateFromReddit = function (req, res, next) {
         }
     );
 };
+
+function randomFromInterval(min,max)
+{
+    return Math.random()*(max-min+1)+min;
+}
 
 require('./cleanup').Cleanup(cleanupOnClose);
 
