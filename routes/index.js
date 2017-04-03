@@ -10,6 +10,7 @@ router.get('/', function(req, res, next) {
         subredditName: config.reddit.subName,
         submissions: req.app.get('hotPosts')
     });
+    next();
 });
 
 module.exports = router;

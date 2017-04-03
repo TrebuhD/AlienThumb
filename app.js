@@ -52,17 +52,8 @@ mongoUtil.connectToServer(function(err) {
     // Get new submissions from reddit and save them to mongo
     app.get('/', updateFromReddit );
 
-    // Render route to browser
-    app.get('/', index);
-
-    // print new item from queue every 5 seconds
-    app.get('/pop', function () {
-        console.log("popping the post queue");
-        setInterval(async function () {
-            let item = mongoUtil.queuePop();
-            console.dir(item);
-        }, 5000);
-    });
+    // Render route to browser and then start getting items from queue
+    app.get('/', index, startQueueStream);
 
     // catch 404 and forward to error handler
     app.use(function(req, res, next) {
@@ -83,6 +74,15 @@ mongoUtil.connectToServer(function(err) {
     });
 
 });
+
+// print new item from queue every 5 seconds
+let startQueueStream = function () {
+    console.log("popping the post queue");
+    setInterval(async function () {
+        let item = submissionStore.queuePop();
+        console.dir(item);
+    }, 5000);
+};
 
 let updateFromReddit = function (req, res, next) {
     console.log("Getting new posts");

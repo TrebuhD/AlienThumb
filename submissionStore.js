@@ -33,13 +33,13 @@ SubmissionStore.prototype = {
             });
     },
     queuePush: function (item) {
-        db.getQueue().add(item, function (err, id) {
+        mongoUtil.getQueue().add(item, function (err, id) {
             if (err) { return console.dir(err); }
             console.log(`Adding obj id ${id} to submission-queue.`);
         });
     },
     queuePop: async function () {
-        db.getQueue().get(function (err, msg) {
+        mongoUtil.getQueue().get(function (err, msg) {
             if (err) { console.dir(err); }
             if (!msg) return null;
             console.log (`msg.id: ${msg.id}`);
