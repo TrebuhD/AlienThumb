@@ -60,7 +60,4 @@ typings/
 # sample responses
 responses/
 
-# config file (contains secrets)
-config.js
-
 bfg.jar

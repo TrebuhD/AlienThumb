@@ -10,7 +10,7 @@ let _submissionQueue;
 
 module.exports = {
     connectToServer: async function ( callback ) {
-        MongoClient.connect(config.mongodb.url, async function (err, db) {
+        MongoClient.connect(process.env.MONGO_URL, async function (err, db) {
             _db = db;
             _submissionQueue = await mongoDbQueue(db, config.mongodb.postQueueName);
             _submissionQueue.createIndexes(function (err) {

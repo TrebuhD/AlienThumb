@@ -1,13 +1,11 @@
 const express = require('express');
 const router = express.Router();
 
-const config = require('../config');
-
 /* GET home page. */
 router.get('/', function(req, res, next) {
     res.render('index', {
         title: 'AlienThumb' ,
-        subredditName: config.reddit.subName,
+        subredditName: process.env.REDDIT_SUB_NAME,
         submissions: req.app.get('hotPosts')
     });
     next();

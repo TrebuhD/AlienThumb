@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const path = require('path');
 const favicon = require('serve-favicon');
@@ -22,9 +23,6 @@ mongoUtil.connectToServer(function(err) {
     console.log("connected to mongodb");
 
     submissionStore = new SubmissionStore();
-
-    // make config available in routes
-    app.locals.config = require('./config');
 
     // view engine setup
     app.set('views', path.join(__dirname, 'views'));
@@ -62,8 +60,8 @@ mongoUtil.connectToServer(function(err) {
             console.log("Performing oauth");
 
             let authUrl = graph.getOauthUrl({
-                "client_id": config.fb.app_id,
-                "redirect_uri": config.fb.redirect_uri,
+                "client_id": process.env.FB_APP_ID,
+                "redirect_uri": process.env.FB_REDIRECT_URI,
                 "scope": config.fb.scope
             });
 
@@ -77,14 +75,14 @@ mongoUtil.connectToServer(function(err) {
         else {
             // send code and get access token
             graph.authorize({
-                "client_id": config.fb.app_id,
-                "redirect_uri": config.fb.redirect_uri,
-                "client_secret": config.fb.app_secret,
+                "client_id": process.env.FB_APP_ID,
+                "redirect_uri": process.env.FB_REDIRECT_URI,
+                "client_secret": process.env.FB_APP_SECRET,
                 "code": req.query.code
             }, function (err, facebookRes) {
                 if (err) { console.dir(err); }
                 console.log('redirecting');
-                graph.setAccessToken(config.fb.long_lived_token_page);
+                graph.setAccessToken(process.env.FB_PAGE_LONG_TOKEN);
                 res.redirect('/UserHasLoggedIn');
             });
         }
@@ -120,8 +118,12 @@ let startMainLoop = function () {
     // run every hour
     let everyHour = 60 * 60 * 1000;
     let everyMinute = 60 * 1000 / 2;
-    setInterval(shareQueueItem, everyMinute);
-    setInterval(updateFromReddit, everyHour);
+    setInterval(shareQueueItem, everyMinute / 2);
+    setInterval(getNewPosts, everyMinute);
+};
+
+let getNewPosts = function () {
+    return updateFromReddit(next=function () {});
 };
 
 let shareQueueItem = async function () {
@@ -144,14 +146,14 @@ let postToFb = function (item) {
         link: item.url
      };
 
-    graph.post(`/${config.fb.pageId}/feed`, fbPost, function (err, res) {
+    graph.post(`/${process.env.FB_PAGE_ID}/feed`, fbPost, function (err, res) {
         if (err) { console.dir(err); }
     });
 };
 
 let updateFromReddit = function (req, res, next) {
     console.log("Getting new posts");
-    submissionPollster.getHotPosts(config).then(
+    submissionPollster.getHotPosts().then(
         function (result) {
             // save the result to use in routes
             app.set('hotPosts', result);
