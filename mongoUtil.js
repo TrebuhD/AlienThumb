@@ -30,9 +30,4 @@ module.exports = {
     getQueue: function () {
         return _submissionQueue;
     },
-    queueClean: function () {
-        _submissionQueue.clean(new function (err) {
-            if (err) { console.dir(err); }
-        });
-    },
 };

@@ -46,6 +46,17 @@ SubmissionStore.prototype = {
             })
         })
     },
+    queueAck: function (msg) {
+        mongoUtil.getQueue().ack(msg, function (err, id) {
+            if (err) { console.dir(err); }
+            console.log(`ack msg id: ${id}`);
+        });
+    },
+    queueClean: function () {
+        mongoUtil.getQueue().clean(new function (err) {
+            if (err) { console.dir(err); }
+        });
+    }
 };
 
 module.exports = SubmissionStore;

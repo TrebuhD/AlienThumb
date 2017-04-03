@@ -80,9 +80,13 @@ let startQueueStream = function () {
     console.log("popping the post queue");
     setInterval(async function () {
         let item = await submissionStore.queuePop();
-        console.log(`msg id: ${item.id}: `);
-        console.dir(item.payload);
-    }, 5000);
+        if (item) {
+            await submissionStore.queueAck(item.ack);
+            submissionStore.queueClean();
+            console.log(`msg id: ${item.id}: `);
+            console.dir(item.payload);
+        }
+    }, 2000);
 };
 
 let updateFromReddit = function (req, res, next) {
