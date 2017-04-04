@@ -92,7 +92,7 @@ mongoUtil.connectToServer(function(err) {
     app.get('/UserHasLoggedIn', updateFromReddit );
 
     // Render route to browser and then start getting items from queue
-    app.get('/UserHasLoggedIn', startMainLoop);
+    app.get('/UserHasLoggedIn', startMainLoop );
 
     // catch 404 and forward to error handler
     app.use(function(req, res, next) {
@@ -114,7 +114,7 @@ mongoUtil.connectToServer(function(err) {
 
 });
 
-let startMainLoop = function () {
+let startMainLoop = function (req, res, next) {
     let time = process.env.MINUTES_BETWEEN_POSTS * 60 * 1000;
     // randomize the timing a bit by multiplying by a value between 0.5 and 1.5
     let rTime = (Math.random() + 0.5) * time;
@@ -122,6 +122,8 @@ let startMainLoop = function () {
     setInterval(shareQueueItem, rTime);
     console.log("in main loop: get new posts");
     setInterval(getNewPosts, rTime);
+    console.log("send success code");
+    res.sendStatus(200);
 };
 
 let getNewPosts = function () {
