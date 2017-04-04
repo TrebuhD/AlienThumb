@@ -117,9 +117,9 @@ mongoUtil.connectToServer(function(err) {
 let startMainLoop = function () {
     let time = process.env.MINUTES_BETWEEN_POSTS * 60 * 1000;
     // randomize the timing a bit by multiplying by a value between 0.5 and 1.5
-    let rTime = (0.5 * time) + Math.random() * time;
-    setInterval(getNewPosts, rTime);
+    let rTime = (Math.random() + 0.5) * time;
     setInterval(shareQueueItem, rTime);
+    setInterval(getNewPosts, rTime);
 };
 
 let getNewPosts = function () {
@@ -138,9 +138,7 @@ let shareQueueItem = async function () {
 };
 
 let postToFb = function (item) {
-    if (item.selftext || item.is_nsfw) {
-        return null;
-    }
+    console.log(`Posting to fb: ${item.title}`);
     let fbPost = {
         message: item.title,
         link: item.url
@@ -159,16 +157,25 @@ let updateFromReddit = function (req, res, next) {
             app.set('hotPosts', result);
             result.forEach(function(item) {
                 let submission = new Submission (item);
-                // store new submissions in cold storage and post queue.
-                submissionStore.ifSubmissionNew(submission, function() {
-                    submissionStore.addToColdStore(submission);
-                    submissionStore.queuePush(submission);
-                });
+                if (isSubmissionOK(submission))
+                    // store new submissions in cold storage and post queue.
+                    submissionStore.ifSubmissionNew(submission, function() {
+                        submissionStore.addToColdStore(submission);
+                        submissionStore.queuePush(submission);
+                    });
             });
             next();
         }
     );
 };
+
+function isSubmissionOK(submission) {
+    // Don't store NSFW or selftext posts
+    if (submission.is_nsfw || submission.selftext) { return false; }
+    let title = submission.title;
+    if (title.includes("comments") || title.includes("/r/")) { return false; }
+    return true;
+}
 
 require('./cleanup').Cleanup(cleanupOnClose);
 
