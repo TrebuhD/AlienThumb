@@ -118,15 +118,18 @@ let startMainLoop = function () {
     let time = process.env.MINUTES_BETWEEN_POSTS * 60 * 1000;
     // randomize the timing a bit by multiplying by a value between 0.5 and 1.5
     let rTime = (Math.random() + 0.5) * time;
+    console.log("in main loop: share item");
     setInterval(shareQueueItem, rTime);
+    console.log("in main loop: get new posts");
     setInterval(getNewPosts, rTime);
 };
 
 let getNewPosts = function () {
-    return updateFromReddit(next=function () {});
+    return updateFromReddit();
 };
 
 let shareQueueItem = async function () {
+    console.log("Sharing an item from the queue");
     let item = await submissionStore.queuePop();
     if (item) {
         await submissionStore.queueAck(item.ack);
@@ -164,7 +167,9 @@ let updateFromReddit = function (req, res, next) {
                         submissionStore.queuePush(submission);
                     });
             });
-            next();
+            if (next) {
+                next();
+            }
         }
     );
 };
