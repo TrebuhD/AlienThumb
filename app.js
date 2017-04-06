@@ -183,8 +183,8 @@ function isSubmissionOK(submission) {
     // for music pages: post from pre-approved hosting (a little hacky)
     if (process.env.MUSICONLY === "true") {
         let domain = submission.domain;
-        if (domain.includes("youtu") || domain.includes("soundcloud") ||
-        domain.includes("bandcamp") || domain.includes("facebook")) { return true; }
+        return domain.includes("youtu") || domain.includes("soundcloud") ||
+            domain.includes("bandcamp") || domain.includes("facebook");
     }
     // don't post x-posts (those link to reddit posts) and stuff where comments are important
     if (title.includes("comments") || title.includes("r/") ||
