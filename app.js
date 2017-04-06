@@ -79,7 +79,7 @@ mongoUtil.connectToServer(function(err) {
                 "redirect_uri": process.env.FB_REDIRECT_URI,
                 "client_secret": process.env.FB_APP_SECRET,
                 "code": req.query.code
-            }, function (err, facebookRes) {
+            }, function (err) {
                 if (err) { console.dir(err); }
                 console.log('redirecting');
                 graph.setAccessToken(process.env.FB_PAGE_LONG_TOKEN);
@@ -180,7 +180,16 @@ function isSubmissionOK(submission) {
     // Don't store NSFW or selftext posts
     if (submission.is_nsfw || submission.selftext) { return false; }
     let title = submission.title;
-    if (title.includes("comments") || title.includes("/r/")) { return false; }
+    // for music pages: post from pre-approved hosting (a little hacky)
+    if (process.env.MUSICONLY === "true") {
+        let domain = submission.domain;
+        if (domain.includes("youtu") || domain.includes("soundcloud") ||
+        domain.includes("bandcamp") || domain.includes("facebook")) { return true; }
+    }
+    // don't post x-posts (those link to reddit posts) and stuff where comments are important
+    if (title.includes("comments") || title.includes("r/") ||
+        title.includes("x-post") || title.includes("xpost")) { return false; }
+    // otherwise post it
     return true;
 }
 
