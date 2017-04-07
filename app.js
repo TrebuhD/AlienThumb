@@ -20,7 +20,7 @@ let app = express();
 
 mongoUtil.connectToServer(function(err) {
     if (err) { console.error(err); }
-    console.log("connected to mongodb");
+    console.log(`connected to mongodb. Open in browser to authenticate.`);
 
     submissionStore = new SubmissionStore();
 
@@ -51,7 +51,7 @@ mongoUtil.connectToServer(function(err) {
     // Routes
 
     app.get('/', function(req, res){
-        res.render("index", { title: "navigate to /auth to connect" });
+        res.redirect('/auth');
     });
 
     app.get('/auth', function (req, res) {
@@ -92,7 +92,7 @@ mongoUtil.connectToServer(function(err) {
     app.get('/UserHasLoggedIn', updateFromReddit );
 
     // Render route to browser and then start getting items from queue
-    app.get('/UserHasLoggedIn', startMainLoop );
+    app.get('/UserHasLoggedIn', start );
 
     // catch 404 and forward to error handler
     app.use(function(req, res, next) {
@@ -114,36 +114,31 @@ mongoUtil.connectToServer(function(err) {
 
 });
 
-let startMainLoop = function (req, res, next) {
+let start = function (req, res, next) {
     let time = process.env.MINUTES_BETWEEN_POSTS * 60 * 1000;
-    // randomize the timing a bit by multiplying by a value between 0.5 and 1.5
-    let rTime = (Math.random() + 0.5) * time;
-    console.log("in main loop: share item");
-    setInterval(shareQueueItem, rTime);
-    console.log("in main loop: get new posts");
-    setInterval(getNewPosts, rTime);
-    console.log("send success code");
-    res.sendStatus(200);
-};
-
-let getNewPosts = function () {
-    return updateFromReddit();
+    console.log(
+        `Starting up: sharing hot submissions from /r/${process.env.REDDIT_SUB_NAME} 
+        with > ${process.env.REDDIT_MIN_SCORE} upvotes every ${process.env.MINUTES_BETWEEN_POSTS} minutes.`);
+    updateFromReddit();
+    setInterval(function () { return updateFromReddit(); }, time);
+    shareQueueItem();
+    setInterval(shareQueueItem, time);
+    res.render("index", { conf: process.env});
 };
 
 let shareQueueItem = async function () {
-    console.log("Sharing an item from the queue");
     let item = await submissionStore.queuePop();
     if (item) {
         await submissionStore.queueAck(item.ack);
-        console.log(`Sharing submission title: ${item.payload.title}: `);
-        console.dir(item.payload);
+        console.log(`Sharing submission, title: ${item.payload.title}, domain: ${item.payload.domain}`);
         postToFb(item.payload);
         submissionStore.queueClean();
+    } else {
+        console.log("The submission queue is empty.")
     }
 };
 
 let postToFb = function (item) {
-    console.log(`Posting to fb: ${item.title}`);
     let fbPost = {
         message: item.title,
         link: item.url
@@ -162,6 +157,7 @@ let updateFromReddit = function (req, res, next) {
             app.set('hotPosts', result);
             result.forEach(function(item) {
                 let submission = new Submission (item);
+                stripPersonalTitle(submission);
                 if (isSubmissionOK(submission))
                     // store new submissions in cold storage and post queue.
                     submissionStore.ifSubmissionNew(submission, function() {
@@ -176,6 +172,13 @@ let updateFromReddit = function (req, res, next) {
     );
 };
 
+// If the reddit submission's title is in the 1st person, remove the title
+// for people to not assume authorship incorrectly.
+// example "Hi guys, I've recorded an album last month, have a listen!".
+function stripPersonalTitle(s) {
+    if (s.title.includes(" I ") || s.title.includes("I've")) { s.title = ""; }
+}
+
 function isSubmissionOK(submission) {
     // Don't store NSFW or selftext posts
     if (submission.is_nsfw || submission.selftext) { return false; }
@@ -186,7 +189,9 @@ function isSubmissionOK(submission) {
         return domain.includes("youtu") || domain.includes("soundcloud") ||
             domain.includes("bandcamp") || domain.includes("facebook");
     }
-    // don't post x-posts (those link to reddit posts) and stuff where comments are important
+    // don't post:
+    // x-posts (those link to reddit posts)
+    // submissions referencing reddit comments in the title
     if (title.includes("comments") || title.includes("r/") ||
         title.includes("x-post") || title.includes("xpost")) { return false; }
     // otherwise post it

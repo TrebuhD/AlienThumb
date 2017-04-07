@@ -5,4 +5,11 @@ body {
 a {
   color: #00B7FF; }
 
+#bigtext {
+  white-space: pre;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 60px;
+  font-weight: 200;
+  line-height: 2; }
+
 /*# sourceMappingURL=style.css.map */

@@ -1,8 +1,11 @@
 extends layout
 
 block content
-  h1= title
-  //p Here are the top posts on /r/#{subredditName}:
+    h1#bigtext
+      | all looks good!
+      | sharing from /r/#{conf.REDDIT_SUB_NAME}
+      | submissions with > #{conf.REDDIT_MIN_SCORE} upvotes
+      | every #{conf.MINUTES_BETWEEN_POSTS} minutes.
 //  each submission in submissions
     li= submission.title + ', score: ' + submission.score
     br

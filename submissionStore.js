@@ -49,7 +49,6 @@ SubmissionStore.prototype = {
     queueAck: function (msg) {
         mongoUtil.getQueue().ack(msg, function (err, id) {
             if (err) { console.dir(err); }
-            console.log(`ack msg id: ${id}`);
         });
     },
     queueClean: function () {
