@@ -20,7 +20,8 @@ let app = express();
 
 mongoUtil.connectToServer(function(err) {
     if (err) { console.error(err); }
-    console.log(`connected to mongodb. Open in browser to authenticate.`);
+    console.log("connected to mongodb. Open app url in browser to authenticate with facebook " +
+        "(if you're unsure what to do, try http://localhost:3000 )");
 
     submissionStore = new SubmissionStore();
 
@@ -81,7 +82,6 @@ mongoUtil.connectToServer(function(err) {
                 "code": req.query.code
             }, function (err) {
                 if (err) { console.dir(err); }
-                console.log('redirecting');
                 graph.setAccessToken(process.env.FB_PAGE_LONG_TOKEN);
                 res.redirect('/UserHasLoggedIn');
             });
@@ -150,7 +150,7 @@ let postToFb = function (item) {
 };
 
 let updateFromReddit = function (req, res, next) {
-    console.log("Getting new posts");
+    console.log(`Getting new posts from /r/${process.env.REDDIT_SUB_NAME}`);
     submissionPollster.getHotPosts().then(
         function (result) {
             // save the result to use in routes
