@@ -1,10 +1,7 @@
 # AlienThumb
 ### Publishes trending reddit submissions to a facebook page
 
-
-
-
-
+internet rule #24: Every repost is always a repost of a repost.
 
 Clone, run `node app.js`, go to localhost:3000/auth. That's it.
 
