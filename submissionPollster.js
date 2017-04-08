@@ -6,7 +6,7 @@ module.exports = {
             userAgent: 'AlienThumb:v0.0.2 (by /u/trebuszek)',
             clientId: process.env.REDDIT_ID,
             clientSecret: process.env.REDDIT_SECRET,
-            username: 'AlienThumb',
+            username: process.env.REDDIT_USERNAME,
             password: process.env.REDDIT_PASSWORD
         });
 
