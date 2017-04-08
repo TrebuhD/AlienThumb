@@ -1,5 +1,10 @@
 # AlienThumb
-Publishes trending reddit submissions to a facebook page
+### Publishes trending reddit submissions to a facebook page
+
+
+
+
+
 
 Clone, run `node app.js`, go to localhost:3000/auth. That's it.
 
