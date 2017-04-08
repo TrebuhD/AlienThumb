@@ -25,7 +25,7 @@ internet rule #24: Every repost is always a repost of a repost.
 - FB_APP_ID
 - FB_APP_SECRET
 - FB_REDIRECT_URI: The authentication URI (set in facebook app settings)
-- FB_PAGE_LONG_TOKEN: non-expiring fb *page* access token
+- FB_PAGE_LONG_TOKEN: non-expiring fb **page** access token
 
 - MONGO_URL: url to mongo database
 - MINUTES_BETWEEN_POSTS: The frequency with which to post
