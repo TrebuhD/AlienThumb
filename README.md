@@ -17,23 +17,23 @@ Look at the console output for errors.
 
 ## Environment variables
 
- REDDIT_ID: your reddit app ID
- REDDIT_SECRET: reddit app secret
- REDDIT_USERNAME
- REDDIT_PASSWORD 
- REDDIT_SUB_NAME: the name of the subreddit to repost from
- REDDIT_MIN_SCORE: minimum score to repost submission
+- REDDIT_ID: your reddit app ID
+- REDDIT_SECRET: reddit app secret
+- REDDIT_USERNAME
+- REDDIT_PASSWORD 
+- REDDIT_SUB_NAME: the name of the subreddit to repost from
+- REDDIT_MIN_SCORE: minimum score to repost submission
 
- FB_USER_ID: facebook page admin ID (https://findmyfbid.com/)
- FB_PAGE_ID: facebook page ID (found in about section)
- FB_APP_ID
- FB_APP_SECRET
- FB_REDIRECT_URI: The authentication URI (set in facebook app settings)
- FB_PAGE_LONG_TOKEN: non-expiring fb *page* access token
+- FB_USER_ID: facebook page admin ID (https://findmyfbid.com/)
+- FB_PAGE_ID: facebook page ID (found in about section)
+- FB_APP_ID
+- FB_APP_SECRET
+- FB_REDIRECT_URI: The authentication URI (set in facebook app settings)
+- FB_PAGE_LONG_TOKEN: non-expiring fb *page* access token
 
- MONGO_URL: url to mongo database
- MINUTES_BETWEEN_POSTS: The frequency with which to post
- MUSICONLY: will only repost music (from a set of domains) if set to true
+- MONGO_URL: url to mongo database
+- MINUTES_BETWEEN_POSTS: The frequency with which to post
+- MUSICONLY: will only repost music (from a set of domains) if set to true
 
 ## How to generate a non-expiring facebook page access token:
 
