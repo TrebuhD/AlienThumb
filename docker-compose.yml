@@ -1,0 +1,35 @@
+version: "3.7"
+
+services:
+  mongo:
+    image: mongo
+    restart: always
+    ports:
+      - 27017:27017
+    env_file:
+      - .env
+
+  node:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    restart: always
+    ports:
+      - 3000:3000
+    volumes:
+      - .:/opt/AlienThumb
+    env_file:
+      - .env
+    command: yarn start
+    depends_on:
+      - mongo
+
+  mongo-express:
+    image: mongo-express
+    restart: always
+    ports:
+      - 8081:8081
+    env_file:
+      - .env
+    depends_on:
+      - mongo
