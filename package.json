@@ -6,7 +6,7 @@
     "start": "node ./bin/www"
   },
   "engines": {
-    "node": "13.8.0"
+    "node": "14.15.1"
   },
   "license": "BSD-3-Clause",
   "dependencies": {

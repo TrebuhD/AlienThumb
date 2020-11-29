@@ -2,15 +2,15 @@ const MongoClient = require("mongodb").MongoClient;
 const config = require("./config");
 const mongoDbQueue = require("mongodb-queue");
 
-let _db;
-let _submissionQueue;
+let database;
+let submissionQueue;
 
 module.exports = {
   connectToServer: async function(callback) {
     await MongoClient.connect(process.env.MONGO_URL, async function(err, db) {
-      _db = db;
-      _submissionQueue = await mongoDbQueue(db, config.mongodb.postQueueName);
-      _submissionQueue.createIndexes(function(err) {
+      database = db;
+      submissionQueue = await mongoDbQueue(db, config.mongodb.postQueueName);
+      submissionQueue.createIndexes(function(err) {
         if (err) {
           console.dir(err);
         }
@@ -19,14 +19,14 @@ module.exports = {
     });
   },
   closeConnection: function() {
-    if (_db) {
-      _db.close();
+    if (database) {
+      database.close();
     }
   },
   getDb: function() {
-    return _db;
+    return database;
   },
   getQueue: function() {
-    return _submissionQueue;
+    return submissionQueue;
   }
 };
