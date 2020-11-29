@@ -6,7 +6,7 @@
     "start": "node ./bin/www"
   },
   "engines": {
-    "node": "11.15.0"
+    "node": "13.8.0"
   },
   "license": "BSD-3-Clause",
   "dependencies": {
@@ -20,7 +20,7 @@
     "mongodb": "^3.3.3",
     "mongodb-queue": "^4.0.0",
     "morgan": "~1.9.1",
-    "node-sass-middleware": "0.9.8",
+    "node-sass-middleware": "0.11.0",
     "serve-favicon": "~2.5.0",
     "snoowrap": "^1.13.0"
   },
